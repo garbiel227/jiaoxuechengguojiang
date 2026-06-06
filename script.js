@@ -11,6 +11,27 @@ window.addEventListener("scroll", updateHeaderTray, { passive: true });
 window.addEventListener("resize", updateHeaderTray);
 updateHeaderTray();
 
+document.querySelectorAll(".header-inner > .search").forEach((form) => {
+  const input = form.querySelector("input");
+  const button = form.querySelector("button");
+
+  button?.addEventListener("click", (event) => {
+    if (!form.classList.contains("is-expanded")) {
+      event.preventDefault();
+      form.classList.add("is-expanded");
+      input?.focus();
+    }
+  });
+
+  form.addEventListener("focusout", () => {
+    window.setTimeout(() => {
+      if (!form.contains(document.activeElement) && !input?.value.trim()) {
+        form.classList.remove("is-expanded");
+      }
+    }, 0);
+  });
+});
+
 const menuToggle = document.querySelector(".menu-toggle");
 const mainNav = document.getElementById("mainNav");
 const mobileNavQuery = window.matchMedia("(max-width: 900px)");
@@ -171,7 +192,7 @@ const detailLinks = [
 const sectionFromBody = document.body.dataset.section;
 const pdfMenu = document.querySelector(".pdf-menu");
 if (pdfMenu && sectionFromBody) {
-  pdfMenu.innerHTML = "<h2>目录</h2>";
+  pdfMenu.innerHTML = "<h2>申报书目录</h2>";
   detailLinks.forEach(([section, label]) => {
     const link = document.createElement("a");
     link.href = `${section}.html`;
@@ -233,12 +254,46 @@ if (supportGallery) {
   const [title, items] = supportSections[section] || supportSections.projects;
   document.getElementById("supportTitle").innerHTML = `${title} <small>/ Supporting Materials</small>`;
   document.title = title;
-  items.forEach(([image, caption]) => {
-    const card = document.createElement("article");
-    card.className = "material-card";
-    card.innerHTML = `<img src="../picture/support/${image}" alt="${caption}"><p>${caption}</p>`;
-    supportGallery.appendChild(card);
-  });
+  if (section === "student-awards") {
+    supportGallery.className = "award-groups";
+    const awardGroups = [
+      {
+        title: "1. 中国数据新闻大赛暨 AIGC 应用大赛（代表性作品）",
+        desc: "中国数据新闻大赛自2015年举办，至今已举办10届。",
+        items: [
+          ["image16.jpeg", "全国一等奖", "中国数据新闻大赛暨 AIGC 应用大赛全国一等奖证书"],
+          ["image13.png", "全国一等奖", "中国数据新闻大赛全国一等奖证书"]
+        ]
+      },
+      {
+        title: "2. 中国国际大学生创新大赛",
+        desc: "以高水平创新实践检验学生综合能力与成果转化成效。",
+        items: [
+          ["image48.jpeg", "全国二等奖", "中国国际大学生创新大赛全国二等奖证书"]
+        ]
+      }
+    ];
+    awardGroups.forEach((group) => {
+      const sectionNode = document.createElement("section");
+      sectionNode.className = "award-group";
+      sectionNode.innerHTML = `<h2>${group.title}</h2><p class="award-desc">${group.desc}</p><div class="award-grid"></div>`;
+      const grid = sectionNode.querySelector(".award-grid");
+      group.items.forEach(([image, level, alt]) => {
+        const item = document.createElement("article");
+        item.className = "award-item";
+        item.innerHTML = `<h3>${level}</h3><a class="award-image" href="../picture/support/${image}" target="_blank" rel="noopener" aria-label="查看${alt}原图"><img src="../picture/support/${image}" alt="${alt}"></a>`;
+        grid.appendChild(item);
+      });
+      supportGallery.appendChild(sectionNode);
+    });
+  } else {
+    items.forEach(([image, caption]) => {
+      const card = document.createElement("article");
+      card.className = "material-card";
+      card.innerHTML = `<a href="../picture/support/${image}" target="_blank" rel="noopener"><img src="../picture/support/${image}" alt="${caption}"></a><p>${caption}</p>`;
+      supportGallery.appendChild(card);
+    });
+  }
 }
 
 const siteSearchIndex = [
@@ -423,4 +478,23 @@ document.addEventListener("click", (event) => {
   if (!event.target.closest(".search")) {
     document.querySelectorAll(".search-suggestions").forEach((suggestions) => suggestions.classList.remove("is-open"));
   }
+});
+
+document.querySelectorAll(".person-card").forEach((card) => {
+  const profileLink = card.querySelector(".person-copy a");
+  if (!profileLink) return;
+  profileLink.innerHTML = '个人主页 <span aria-hidden="true">⇀</span>';
+  card.tabIndex = 0;
+  card.setAttribute("role", "link");
+  card.setAttribute("aria-label", `打开${card.querySelector(".person-photo img")?.alt || "完成人"}个人主页`);
+  card.addEventListener("click", (event) => {
+    if (event.target.closest("a")) return;
+    window.open(profileLink.href, "_blank", "noopener");
+  });
+  card.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      window.open(profileLink.href, "_blank", "noopener");
+    }
+  });
 });

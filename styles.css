@@ -30,6 +30,22 @@ a {
   text-decoration: none;
 }
 
+a:not(.brand, .feature-tile, .achievement-card, .material-card a, .award-image, .search-results-list a, .paper-list a, .person-copy a) {
+  background-image: repeating-linear-gradient(90deg, currentColor 0 4px, transparent 4px 8px);
+  background-origin: content-box;
+  background-position: left calc(100% - 1px);
+  background-repeat: no-repeat;
+  background-size: 0 1px;
+  width: fit-content;
+  max-width: 100%;
+  transition: background-size .32s ease, color .25s ease;
+}
+
+a:not(.brand, .feature-tile, .achievement-card, .material-card a, .award-image, .search-results-list a, .paper-list a, .person-copy a):hover,
+a:not(.brand, .feature-tile, .achievement-card, .material-card a, .award-image, .search-results-list a, .paper-list a, .person-copy a):focus-visible {
+  background-size: 100% 1px;
+}
+
 .site-header {
   position: fixed;
   inset: 0 0 auto;
@@ -86,9 +102,9 @@ a {
 .header-inner {
   position: relative;
   z-index: 2;
-  width: min(1180px, calc(100vw - 80px));
+  width: min(1580px, calc(100vw - 88px));
   margin: 0 auto;
-  min-height: 84px;
+  min-height: 126px;
   display: flex;
   align-items: center;
   gap: 36px;
@@ -98,9 +114,26 @@ a {
 .brand {
   flex: 1;
   min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 24px;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: end;
+  gap: 10px 26px;
+  padding-top: 18px;
+}
+
+.brand::after {
+  content: "国家级教学成果奖申报";
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  margin-left: 198px;
+  padding-left: 24px;
+  border-left: 1px solid rgba(255,255,255,.9);
+  font-family: "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  font-size: 24px;
+  line-height: 34px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .brand img {
@@ -109,23 +142,45 @@ a {
 }
 
 .brand-logo {
-  width: 150px;
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  margin-left: 10px;
+  width: 166px;
   flex: 0 0 auto;
 }
 
 .brand-title {
-  width: min(640px, calc(100% - 174px));
+  grid-column: 1 / -1;
+  grid-row: 2;
+  justify-self: start;
+  width: min(990px, 100%);
+  transform: translateY(-5px);
 }
 
 .search {
   position: relative;
-  width: 132px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
-  padding: 0 12px 0 16px;
-  background: rgba(255,255,255,.86);
-  border-radius: 18px;
+  justify-content: center;
+  align-self: flex-end;
+  margin-bottom: 20px;
+  padding: 0 9px;
+  overflow: visible;
+  background: rgba(255,255,255,.7);
+  border-radius: 50%;
+  transition: width .32s ease, border-radius .32s ease, background .25s ease;
+}
+
+.search.is-expanded,
+.search:focus-within {
+  width: 220px;
+  justify-content: flex-start;
+  padding-left: 16px;
+  background: rgba(255,255,255,.94);
+  border-radius: 20px;
 }
 
 .search-suggestions {
@@ -161,20 +216,30 @@ a {
 }
 
 .search input {
-  width: 100%;
+  width: 0;
   min-width: 0;
+  padding: 0;
   border: 0;
   outline: 0;
   color: #111;
   background: transparent;
   font-family: inherit;
+  opacity: 0;
+  transition: width .32s ease, opacity .2s ease;
+}
+
+.search.is-expanded input,
+.search:focus-within input {
+  width: 100%;
+  opacity: 1;
 }
 
 .search button {
-  position: relative;
-  width: 20px;
-  height: 20px;
-  flex: 0 0 20px;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  display: grid;
+  place-items: center;
   padding: 0;
   border: 0;
   color: #111;
@@ -185,22 +250,22 @@ a {
 .search-icon {
   position: relative;
   display: block;
-  width: 12px;
-  height: 12px;
-  margin: 2px auto 0;
-  border: 1.8px solid currentColor;
+  width: 11px;
+  height: 11px;
+  margin: 0;
+  border: 1.6px solid currentColor;
   border-radius: 50%;
 }
 
 .search-icon::after {
   content: "";
   position: absolute;
-  width: 6px;
-  height: 1.8px;
-  right: -5px;
-  bottom: -3px;
+  width: 5px;
+  height: 1.6px;
+  right: -4px;
+  bottom: -2px;
   background: currentColor;
-  border-radius: 2px;
+  border-radius: 999px;
   transform: rotate(45deg);
   transform-origin: left center;
 }
@@ -367,6 +432,9 @@ a {
 
 .nav-submenu a {
   display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
   padding: 9px 0;
   color: #fff;
   font-size: 16px;
@@ -538,6 +606,7 @@ a {
 
 .intro p {
   border-top: 0;
+  margin-top: -10px;
   font-size: 18px;
   line-height: 1.85;
 }
@@ -625,6 +694,7 @@ a {
 }
 
 .achievement-card {
+  display: block;
   position: relative;
   isolation: isolate;
   min-height: 315px;
@@ -632,6 +702,14 @@ a {
   overflow: hidden;
   color: #fff;
   text-align: center;
+}
+
+.standalone-visual {
+  display: block;
+  width: min(1180px, calc(100vw - 80px));
+  height: auto;
+  margin: 0 auto;
+  box-shadow: 0 12px 36px rgba(0, 30, 86, .14);
 }
 
 .achievement-card::before,
@@ -703,17 +781,8 @@ a {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px 44px;
-  font-size: 21px;
+  font-size: 19px;
   line-height: 1.35;
-}
-
-.link-grid a:hover,
-.main-nav a:hover,
-.pdf-menu a:hover {
-  text-decoration: underline;
-  text-decoration-style: dashed;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 6px;
 }
 
 .timeline-section {
@@ -909,7 +978,7 @@ a {
 
 .contributors-main {
   min-height: 100vh;
-  padding: 184px 0 90px;
+  padding: 228px 0 90px;
 }
 
 .contributors-heading {
@@ -992,6 +1061,7 @@ a {
   position: relative;
   min-height: 320px;
   padding: 116px 0 0 92px;
+  cursor: pointer;
 }
 
 .person-photo {
@@ -1027,18 +1097,29 @@ a {
 }
 
 .person-copy {
+  position: relative;
+  z-index: 1;
   min-height: 204px;
   padding: 34px 24px 20px 120px;
   display: flex;
   flex-direction: column;
   color: #fff;
   background: #004a98;
+  box-shadow: 0 12px 24px rgba(0, 30, 86, .12);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.person-card:hover .person-copy,
+.person-card:focus-visible .person-copy,
+.person-card:focus-within .person-copy {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 34px rgba(0, 30, 86, .2);
 }
 
 .person-copy .person-rank {
   position: absolute;
-  left: 202px;
-  top: 54px;
+  left: 110px;
+  top: -62px;
   margin: 0;
   color: var(--blue);
   font-size: 21px;
@@ -1068,12 +1149,25 @@ a {
   align-self: flex-end;
   margin-top: auto;
   padding-bottom: 2px;
-  border-bottom: 1px dashed rgba(255,255,255,.75);
   font-size: 14px;
+  transition: transform .28s ease;
 }
 
+.person-copy a span {
+  display: inline-block;
+  transition: transform .28s ease;
+}
+
+.person-card:hover .person-copy a,
+.person-card:focus-visible .person-copy a,
 .person-copy a:hover {
-  border-bottom-color: transparent;
+  transform: translate(-2px, -3px);
+}
+
+.person-card:hover .person-copy a span,
+.person-card:focus-visible .person-copy a span,
+.person-copy a:hover span {
+  transform: translateX(7px);
 }
 
 .media {
@@ -1109,7 +1203,7 @@ a {
 }
 
 .detail-main {
-  padding-top: 184px;
+  padding-top: 228px;
 }
 
 .detail-heading {
@@ -1166,6 +1260,8 @@ a {
 
 .pdf-menu a {
   display: block;
+  width: fit-content;
+  max-width: 100%;
   padding: 13px 0;
   color: #1a1a1a;
   font-size: 19px;
@@ -1192,7 +1288,7 @@ a {
 
 .support-main {
   min-height: 100vh;
-  padding: 184px 0 80px;
+  padding: 228px 0 80px;
 }
 
 .support-heading,
@@ -1266,7 +1362,6 @@ a {
   gap: 12px;
   padding: 16px 22px;
   color: var(--blue);
-  border-bottom: 1px dashed var(--blue);
   font-size: 18px;
   font-weight: 700;
 }
@@ -1281,6 +1376,13 @@ a {
   overflow: hidden;
   background: rgba(255,255,255,.88);
   box-shadow: 0 12px 30px rgba(0,30,86,.1);
+}
+
+.material-card > a {
+  display: block;
+  padding: 18px;
+  background: #fff;
+  cursor: zoom-in;
 }
 
 .material-card img {
@@ -1298,6 +1400,59 @@ a {
   font-size: 16px;
   line-height: 1.55;
   font-weight: 700;
+}
+
+.award-groups {
+  display: grid;
+  gap: 58px;
+}
+
+.award-group > h2 {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 0 12px;
+  padding: 13px 24px;
+  color: #fff;
+  background: #0453a4;
+  font-size: 23px;
+  line-height: 1.35;
+}
+
+.award-desc {
+  margin: 0 0 40px 42px;
+  color: #0453a4;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.award-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 30px;
+  align-items: start;
+}
+
+.award-item h3 {
+  margin: 0 0 10px 5px;
+  font-size: 23px;
+  line-height: 1.35;
+}
+
+.award-image {
+  display: grid;
+  place-items: center;
+  min-height: 390px;
+  padding: 18px;
+  background: #fff;
+  box-shadow: 0 2px 7px rgba(0, 30, 86, .18);
+  cursor: zoom-in;
+}
+
+.award-image img {
+  display: block;
+  width: 100%;
+  height: 354px;
+  object-fit: contain;
 }
 
 .textbook-gallery {
@@ -1328,6 +1483,20 @@ a {
 }
 
 @media (max-width: 900px) {
+  .site-header.nav-open::before {
+    opacity: 0;
+  }
+
+  .site-header.nav-open {
+    background-color: rgba(0, 63, 135, .96);
+    box-shadow: 0 8px 24px rgba(0, 30, 86, .25);
+  }
+
+  .site-header.nav-open::after {
+    height: 62px;
+    background: rgba(255,255,255,.03);
+  }
+
   .achievement-summary {
     width: calc(100vw - 32px);
     margin-bottom: 48px;
@@ -1335,6 +1504,10 @@ a {
 
   .achievement-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .standalone-visual {
+    width: calc(100vw - 32px);
   }
 
   .achievement-card {
@@ -1348,24 +1521,43 @@ a {
 
   .header-inner {
     width: calc(100vw - 32px);
-    min-height: 94px;
+    min-height: 62px;
     gap: 10px;
   }
 
   .brand {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 4px;
-    padding: 7px 0;
+    align-items: center;
+    grid-template-columns: max-content 1fr;
+    gap: 5px 12px;
+    padding: 6px 0 1px;
+  }
+
+  .brand::after {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    margin-left: 0;
+    padding-left: 12px;
+    font-size: clamp(11px, 3vw, 15px);
+    line-height: 1.45;
+    white-space: normal;
   }
 
   .brand-logo {
-    width: 92px;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    margin-left: 5px;
+    width: 86px;
   }
 
   .brand-title {
-    width: 100%;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: start;
+    width: 96%;
     max-width: 560px;
+    transform: translateY(-2px);
   }
 
   .search {
@@ -1379,10 +1571,10 @@ a {
 
   .main-nav {
     position: absolute;
-    left: 16px;
-    right: 16px;
-    top: 94px;
-    width: auto;
+    left: 0;
+    right: 0;
+    top: 62px;
+    width: 100%;
     height: auto;
     max-height: 0;
     overflow: hidden;
@@ -1401,7 +1593,7 @@ a {
   }
 
   .site-header.nav-open .main-nav {
-    max-height: calc(100vh - 92px);
+    max-height: calc(100vh - 62px);
     overflow-y: auto;
     padding: 10px 0;
     opacity: 1;
@@ -1427,7 +1619,14 @@ a {
     width: calc(100% - 40px);
     height: 36px;
     margin: 10px 20px;
+    padding: 0 12px 0 16px;
     background: rgba(255,255,255,.9);
+    border-radius: 18px;
+  }
+
+  .main-nav .mobile-search input {
+    width: 100%;
+    opacity: 1;
   }
 
   .nav-dropdown .nav-trigger::after {
@@ -1491,7 +1690,7 @@ a {
   }
 
   .hero {
-    aspect-ratio: 2 / 1;
+    aspect-ratio: 3 / 2;
     height: auto;
   }
 
@@ -1528,7 +1727,7 @@ a {
   }
 
   .contributors-main {
-    padding: 100px 0 56px;
+    padding: 96px 0 56px;
   }
 
   .contributors-heading {
@@ -1577,7 +1776,7 @@ a {
 
   .person-card {
     min-height: 238px;
-    padding: 64px 0 0 116px;
+    padding: 64px 0 0 54px;
   }
 
   .person-photo {
@@ -1586,15 +1785,15 @@ a {
   }
 
   .person-copy .person-rank {
-    left: 116px;
-    top: 38px;
+    left: 62px;
+    top: -26px;
     font-size: 13px;
     line-height: 1.05;
   }
 
   .person-copy {
     min-height: 174px;
-    padding: 22px 16px 16px 22px;
+    padding: 22px 16px 16px 82px;
   }
 
   .person-copy h2 {
@@ -1646,7 +1845,7 @@ a {
 
   .link-grid {
     grid-template-columns: 1fr;
-    font-size: 19px;
+    font-size: 17px;
   }
 
   .timeline-section {
@@ -1675,7 +1874,7 @@ a {
   }
 
   .detail-main {
-    padding-top: 100px;
+    padding-top: 96px;
   }
 
   .pdf-layout {
@@ -1709,7 +1908,7 @@ a {
   }
 
   .support-main {
-    padding: 100px 0 56px;
+    padding: 96px 0 56px;
   }
 
   .support-heading,
@@ -1757,10 +1956,31 @@ a {
   .textbook-gallery {
     grid-template-columns: 1fr;
   }
-}
 
-@media (max-width: 520px) {
-  .achievement-grid {
+  .award-groups {
+    gap: 42px;
+  }
+
+  .award-group > h2 {
+    font-size: 19px;
+  }
+
+  .award-desc {
+    margin: 0 0 25px 0;
+    font-size: 15px;
+  }
+
+  .award-grid {
     grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .award-image {
+    min-height: 0;
+  }
+
+  .award-image img {
+    height: auto;
+    max-height: 520px;
   }
 }
