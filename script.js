@@ -151,6 +151,62 @@ if (timelineItems.length) {
   timelineArea?.addEventListener("focusout", startTimeline);
 }
 
+const awardCovers = [...document.querySelectorAll(".award-cover")];
+let activeAward = 0;
+let awardTimer;
+
+function getAwardOffset(index) {
+  const total = awardCovers.length;
+  let offset = (index - activeAward + total) % total;
+  if (offset > total / 2) offset -= total;
+  return offset;
+}
+
+function showAward(index) {
+  if (!awardCovers.length) return;
+  activeAward = (index + awardCovers.length) % awardCovers.length;
+  awardCovers.forEach((cover, i) => {
+    const offset = getAwardOffset(i);
+    let positionClass = "is-hidden";
+    if (offset === 0) positionClass = "is-center";
+    else if (offset === -1) positionClass = "is-left-1";
+    else if (offset === 1) positionClass = "is-right-1";
+    else if (offset === -2) positionClass = "is-left-2";
+    else if (offset === 2) positionClass = "is-right-2";
+    else if (offset === -3) positionClass = "is-left-3";
+    else if (offset === 3) positionClass = "is-right-3";
+    else if (offset === -4) positionClass = "is-left-4";
+    else if (offset === 4) positionClass = "is-right-4";
+    cover.dataset.position = positionClass;
+  });
+}
+
+function startAwardCarousel() {
+  if (awardCovers.length < 2) return;
+  clearInterval(awardTimer);
+  awardTimer = setInterval(() => showAward(activeAward + 1), 2600);
+}
+
+if (awardCovers.length) {
+  showAward(0);
+  startAwardCarousel();
+  const awardCarousel = document.querySelector(".award-carousel");
+  awardCarousel?.addEventListener("click", (event) => {
+    event.preventDefault();
+    const rect = awardCarousel.getBoundingClientRect();
+    const dx = event.clientX - (rect.left + rect.width / 2);
+    const abs = Math.abs(dx);
+    if (abs < 90) return;
+    const direction = dx > 0 ? 1 : -1;
+    const step = abs > 520 ? 4 : abs > 380 ? 3 : abs > 220 ? 2 : 1;
+    showAward(activeAward + direction * step);
+    startAwardCarousel();
+  });
+  awardCovers.forEach((cover, index) => {
+    cover.addEventListener("focus", () => showAward(index));
+  });
+}
+
 const detailData = {
   preview: ["成果预览", "申报书封面及成果基本信息。", 1],
   intro: ["成果简介", "成果简介及主要解决的教学问题。", 9],
@@ -229,7 +285,7 @@ if (supportGallery) {
       ["image13.png", "中国数据新闻大赛代表性获奖证书"],
       ["image48.jpeg", "中国国际大学生创新大赛代表性获奖证书"]
     ]],
-    "student-projects": ["指导学生获批项目和教学奖励材料", [
+    "student-projects": ["学生获批项目", [
       ["image24.jpeg", "大学生创新创业项目获奖材料"],
       ["image35.png", "学生项目结项与验收材料"],
       ["image16.jpeg", "教师指导学生竞赛获奖材料"]
@@ -254,22 +310,106 @@ if (supportGallery) {
   const [title, items] = supportSections[section] || supportSections.projects;
   document.getElementById("supportTitle").innerHTML = `${title} <small>/ Supporting Materials</small>`;
   document.title = title;
-  if (section === "student-awards") {
+  if (section === "projects" || section === "student-projects") {
+    const pdfMap = {
+      projects: ["教师教改项目", "../webfiles/教师教改项目.pdf"],
+      "student-projects": ["学生获批项目", "../webfiles/学生获批项目.pdf"]
+    };
+    const [pdfTitle, pdfSrc] = pdfMap[section];
+    document.getElementById("supportTitle").innerHTML = `${pdfTitle} <small>/ Supporting Materials</small>`;
+    document.title = pdfTitle;
+    supportGallery.className = "pdf-frame support-pdf-frame";
+    supportGallery.innerHTML = `<iframe title="${pdfTitle} PDF" src="${pdfSrc}"></iframe>`;
+  } else if (section === "student-awards") {
     supportGallery.className = "award-groups";
     const awardGroups = [
       {
-        title: "1. 中国数据新闻大赛暨 AIGC 应用大赛（代表性作品）",
-        desc: "中国数据新闻大赛自2015年举办，至今已举办10届。",
+        title: "1. 中国数据新闻大赛暨 AIGC 应用大赛",
+        desc: "全国数据新闻领域规模最大的标杆赛事，累计吸引上千所高校、上万名师生参赛。顺应国家媒体融合战略，被誉为“新闻传播学科最具专业性”的竞赛之一，获奖作品代表行业高水准。",
         items: [
-          ["image16.jpeg", "全国一等奖", "中国数据新闻大赛暨 AIGC 应用大赛全国一等奖证书"],
-          ["image13.png", "全国一等奖", "中国数据新闻大赛全国一等奖证书"]
+          ["数据新闻/image12.png", "全国一等奖", "中国数据新闻大赛全国一等奖证书"],
+          ["数据新闻/image13.png", "全国一等奖", "中国数据新闻大赛全国一等奖证书"],
+          ["数据新闻/数据新闻6-2.png", "全国二等奖", "中国数据新闻大赛全国二等奖证书"],
+          ["数据新闻/image14.png", "全国三等奖", "中国数据新闻大赛全国三等奖证书"],
+          ["数据新闻/image16.jpeg", "全国三等奖", "中国数据新闻大赛全国三等奖证书"],
+          ["数据新闻/数据新闻6-3.png", "全国三等奖", "中国数据新闻大赛全国三等奖证书"]
         ]
       },
       {
-        title: "2. 中国国际大学生创新大赛",
-        desc: "以高水平创新实践检验学生综合能力与成果转化成效。",
+        title: "2. 全国大学生广告艺术大赛（大广赛）",
+        desc: "教育部A类竞赛，纳入高校竞赛评估排行榜。赛事覆盖全国29个赛区、千余所高校，累计参赛师生超百万。是国内规模最大、公信力最高的广告艺术学科赛事。",
         items: [
-          ["image48.jpeg", "全国二等奖", "中国国际大学生创新大赛全国二等奖证书"]
+          ["大广赛/第16届大广赛 全国总评审一等奖2.png", "全国一等奖", "全国大学生广告艺术大赛全国一等奖证书"],
+          ["大广赛/第16届大广赛 全国总评审一等奖1.png", "全国一等奖", "全国大学生广告艺术大赛全国一等奖证书"],
+          ["大广赛/第16届大广赛 全国总评审一等奖.png", "全国一等奖", "全国大学生广告艺术大赛全国一等奖证书"],
+          ["大广赛/17大广赛二等奖3.png", "全国二等奖", "全国大学生广告艺术大赛全国二等奖证书"],
+          ["大广赛/17大广赛二等奖2.png", "全国二等奖", "全国大学生广告艺术大赛全国二等奖证书"],
+          ["大广赛/17大广赛二等奖.png", "全国二等奖", "全国大学生广告艺术大赛全国二等奖证书"],
+          ["大广赛/全国策划二等-张可欣、沈婷婷等.jpg", "全国二等奖", "全国大学生广告艺术大赛全国策划二等奖证书"],
+          ["大广赛/全国策划二等-申芸慈、张百盈等.jpg", "全国二等奖", "全国大学生广告艺术大赛全国策划二等奖证书"]
+        ]
+      },
+      {
+        title: "3. 中国国际大学生创新大赛",
+        desc: "由教育部等12个部委联合主办，覆盖全球百余个国家，累计参赛项目千万余个。稳居全国高校A类竞赛首位，国赛金奖率不足1%。是国内外大学生创新创业领域最具权威和影响力的赛事。",
+        items: [
+          ["中国国际大学生创新创业大赛（互联网+）/image24.jpeg", "天津赛区高教主赛道金奖", "中国国际大学生创新大赛天津赛区高教主赛道金奖证书"],
+          ["中国国际大学生创新创业大赛（互联网+）/7d03639d7ad2800cba4e7011895ca30b.png", "天津赛区青年红色筑梦之旅赛道银奖", "中国国际大学生创新大赛天津赛区青年红色筑梦之旅赛道银奖证书"],
+          ["中国国际大学生创新创业大赛（互联网+）/7fa5a10755940fc45f74bde364141b8c.jpg", "天津赛区挑战杯银奖", "中国国际大学生创新大赛天津赛区挑战杯银奖证书"],
+          ["中国国际大学生创新创业大赛（互联网+）/5c0f2e4a8ad432cfa27a00ed55c42979.jpg", "天津赛区优秀创意奖", "中国国际大学生创新大赛天津赛区优秀创意奖证书"]
+        ]
+      },
+      {
+        title: "4. “挑战杯”大学生课外学术科技作品竞赛",
+        desc: "被誉为中国大学生科技创新的“奥林匹克”。每届吸引全国2000余所高校、超200万学生参赛。由共青团中央等权威机构主办，是衡量高校创新人才培养质量的核心指标赛事。",
+        items: [
+          ["挑战杯/全国一等奖.jpg", "全国一等奖", "挑战杯大学生课外学术科技作品竞赛全国一等奖证书"],
+          ["挑战杯/市级特等奖.jpg", "市级特等奖", "挑战杯大学生课外学术科技作品竞赛市级特等奖证书"]
+        ]
+      },
+      {
+        title: "5. 中国大学生公共关系大赛",
+        desc: "由中国国际公共关系协会（CIPRA）主办，国内公关领域最高等级的校园赛事。每届吸引百所高校、数千名学生参与。产教融合程度深，是业界选拔人才和高校检验教学成果的关键舞台。",
+        items: [
+          ["公共关系大赛/公关一等奖.png", "全国一等奖", "第八届中国大学生公共关系大赛全国一等奖证书"],
+          ["公共关系大赛/第十届二等奖1.jpg", "全国二等奖", "第十届中国大学生公共关系大赛全国二等奖证书"],
+          ["公共关系大赛/第十届二等奖2.png", "全国二等奖", "第十届中国大学生公共关系大赛全国二等奖证书"],
+          ["公共关系大赛/第十届三等奖1.png", "全国三等奖", "第十届中国大学生公共关系大赛全国三等奖证书"],
+          ["公共关系大赛/第十届三等奖2.png", "全国三等奖", "第十届中国大学生公共关系大赛全国三等奖证书"],
+          ["公共关系大赛/第九届公关大赛三等奖1.jpeg", "全国三等奖", "第九届中国大学生公共关系大赛全国三等奖证书"],
+          ["公共关系大赛/第九届公关大赛三等奖2.png", "全国三等奖", "第九届中国大学生公共关系大赛全国三等奖证书"]
+        ]
+      },
+      {
+        title: "6. 中国大学生广告艺术节学院奖",
+        desc: "始创于1999年，覆盖全国1830所高校，每年超150万师生参赛。中国广告协会主办，企业命题实战性强，获奖作品常被品牌直接采用。是广告、营销领域最具市场价值的校园赛事之一。",
+        items: [
+          ["学院奖/24学院奖金奖（干得漂亮）.jpeg", "全国金奖", "中国大学生广告艺术节学院奖全国金奖证书"],
+          ["学院奖/2023学院奖秋季赛金奖.png", "全国金奖", "中国大学生广告艺术节学院奖全国金奖证书"],
+          ["学院奖/2022学院奖春季赛金奖.PNG", "全国金奖", "中国大学生广告艺术节学院奖全国金奖证书"],
+          ["学院奖/24学院奖银奖（人间至味是回甘）.jpeg", "全国银奖", "中国大学生广告艺术节学院奖全国银奖证书"],
+          ["学院奖/24学院奖银奖（无形奋斗变“行”记）.jpeg", "全国银奖", "中国大学生广告艺术节学院奖全国银奖证书"],
+          ["学院奖/2021学院奖秋季赛京东通讯策划案类全国银奖.png", "全国银奖", "中国大学生广告艺术节学院奖全国银奖证书"],
+          ["学院奖/2020学院奖春季赛平面全国银奖.jpg", "全国银奖", "中国大学生广告艺术节学院奖全国银奖证书"],
+          ["学院奖/2023学院奖秋季赛铜奖.png", "全国铜奖", "中国大学生广告艺术节学院奖全国铜奖证书"]
+        ]
+      },
+      {
+        title: "7. 优秀毕业论文",
+        desc: "学生优秀毕业论文代表性证书。",
+        items: [
+          ["优秀毕业论文/2024优秀论文.png", "2024优秀论文", "2024优秀论文证书"],
+          ["优秀毕业论文/2015年优秀论文.png", "2015年优秀论文", "2015年优秀论文证书"]
+        ]
+      },
+      {
+        title: "8. 其他赛事",
+        desc: "学生其他代表性赛事获奖证书。",
+        items: [
+          ["其他赛事/第四届特等奖.png", "第四届特等奖", "第四届特等奖证书"],
+          ["其他赛事/第三届二等奖.png", "第三届二等奖", "第三届二等奖证书"],
+          ["其他赛事/第三届新视听三等奖.png", "第三届新视听三等奖", "第三届新视听三等奖证书"],
+          ["其他赛事/粤港澳大湾区创意节金奖.jpeg", "粤港澳大湾区创意节金奖", "粤港澳大湾区创意节金奖证书"]
         ]
       }
     ];
@@ -297,7 +437,7 @@ if (supportGallery) {
 }
 
 const siteSearchIndex = [
-  ["首页", "index.html", "首页 四全 全过程 全场景 全要素 全效能 时间轴 教学成果奖"],
+  ["首页", "index.html", "首页 四全 全过程 全场景 全要素 全效能 高等级获奖证书 教学成果奖"],
   ["成果简介", "pages/profile.html", "成果简介 四全培养体系 部校共建 马克思主义新闻观"],
   ["完成人介绍", "pages/contributor-profiles.html", "完成人介绍 李秀云 林靖 胡振宇 李蓓 张洪伟 祁小龙 冯帆 韩诚 王芳 李冰玉 马涛"],
   ["成果预览（PDF 第1页）", "pages/preview.html", "PDF 申报材料 申报书 封面 成果名称 成果预览"],
@@ -314,10 +454,11 @@ const siteSearchIndex = [
   ["成果支撑材料", "pages/teaching.html", "成果支撑材料 附件 教改论文 教师教改项目 学生获奖"],
   ["教改论文与著作", "pages/papers.html", "成果支撑材料 论文 著作 教改论文"],
   ["教材展示", "pages/textbooks.html", "教材 品牌创意案例教程 胡振宇 清华大学出版社"],
-  ["教师教改项目", "pages/support-materials.html?section=projects", "成果支撑材料 教师教改项目"],
+  ["教师教改项目", "pages/support-materials.html?section=projects", "成果支撑材料 教师教改项目 PDF"],
   ["学生代表性获奖证书", "pages/support-materials.html?section=student-awards", "成果支撑材料 学生 获奖证书"],
-  ["指导学生获批项目和教学奖励材料", "pages/support-materials.html?section=student-projects", "成果支撑材料 学生项目 教学奖励"],
-  ["教学成果媒体发布材料", "pages/support-materials.html?section=media", "成果支撑材料 媒体发布"],
+  ["学生获批项目", "pages/support-materials.html?section=student-projects", "成果支撑材料 学生获批项目 PDF"],
+  ["公开发表作品", "pages/student-works.html", "学生发表媒体作品 公开发表作品 学习强国 新华网 光明网 津云"],
+  ["专业采风里程", "pages/caifeng.html", "专业采风 采风里程 20000 长江日报 大同"],
   ["教师代表性成果", "pages/support-materials.html?section=teacher-results", "成果支撑材料 教师代表性成果"],
   ["其他教学成果材料", "pages/support-materials.html?section=other", "成果支撑材料 其他教学成果"],
   ["教学成果报告（附件3 PDF）", "pages/teaching-report.html", "PDF 教学成果报告 附件三 附件3"],
@@ -496,5 +637,21 @@ document.querySelectorAll(".person-card").forEach((card) => {
       event.preventDefault();
       window.open(profileLink.href, "_blank", "noopener");
     }
+  });
+});
+
+document.querySelectorAll(".textbook-pdf-menu a").forEach((link) => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    const viewer = document.querySelector('iframe[name="textbookPdf"]');
+    if (viewer) {
+      const target = link.href;
+      viewer.src = "about:blank";
+      window.setTimeout(() => {
+        viewer.src = target;
+      }, 30);
+    }
+    document.querySelectorAll(".textbook-pdf-menu a").forEach((item) => item.classList.remove("is-current"));
+    link.classList.add("is-current");
   });
 });
